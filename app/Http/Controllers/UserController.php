@@ -6,6 +6,7 @@ use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 use Exception;
 
 class UserController extends Controller
@@ -64,6 +65,34 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'Terjadi kesalahan',
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function index()
+    {
+        try {
+            $user = Auth::user();
+
+            // Cek apakah user admin
+            if ($user->role !== 'admin') {
+                return response()->json([
+                    'message' => 'Forbidden, hanya admin yang boleh mengakses'
+                ], 403);
+            }
+
+            // Kalau admin, baru tampilkan semua user
+            $users = User::all();
+
+            return response()->json([
+                'message' => 'List semua user',
+                'data' => UserResource::collection($users)
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
