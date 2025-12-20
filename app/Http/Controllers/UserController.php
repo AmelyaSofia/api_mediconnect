@@ -74,14 +74,12 @@ class UserController extends Controller
         try {
             $user = Auth::user();
 
-            // Cek apakah user admin
             if ($user->role !== 'admin') {
                 return response()->json([
                     'message' => 'Forbidden, hanya admin yang boleh mengakses'
                 ], 403);
             }
 
-            // Kalau admin, baru tampilkan semua user
             $users = User::all();
 
             return response()->json([
