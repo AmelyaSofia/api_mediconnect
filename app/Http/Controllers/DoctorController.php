@@ -15,20 +15,10 @@ class DoctorController extends Controller
      */
     public function index()
     {
-        try {
-            $doctors = Doctor::all();
-
-            return response()->json([
-                'message' => 'List dokter',
-                'data' => $doctors
-            ], 200);
-
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Terjadi kesalahan',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'data' => Doctor::orderBy('created_at', 'desc')->get()
+        ], 200);
     }
 
     /**
@@ -81,11 +71,18 @@ class DoctorController extends Controller
                 'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
             ]);
 
-            // === HANDLE FOTO ===
             $photoPath = null;
             if ($request->hasFile('photo')) {
-                $photoPath = $request->file('photo')->store('doctors', 'public');
+                $fileName = time().'_'.$request->file('photo')->getClientOriginalName();
+
+                $request->file('photo')->move(
+                    public_path('doctors'),
+                    $fileName
+                );
+
+                $photoPath = 'doctors/' . $fileName; 
             }
+
 
             $doctor = Doctor::create([
                 'name' => $request->name,
@@ -140,12 +137,20 @@ class DoctorController extends Controller
                 'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
             ]);
 
-            // Update foto jika ada
             if ($request->hasFile('photo')) {
-                if ($doctor->photo) {
-                    Storage::disk('public')->delete($doctor->photo);
+
+                if ($doctor->photo && file_exists(public_path($doctor->photo))) {
+                    unlink(public_path($doctor->photo));
                 }
-                $doctor->photo = $request->file('photo')->store('doctors', 'public');
+
+                $fileName = time().'_'.$request->file('photo')->getClientOriginalName();
+
+                $request->file('photo')->move(
+                    public_path('doctors'),
+                    $fileName
+                );
+
+                $doctor->photo = 'doctors/' . $fileName;
             }
 
             $doctor->update($request->only([
@@ -169,6 +174,7 @@ class DoctorController extends Controller
         }
     }
 
+
     /**
      * DELETE - Hapus dokter (ADMIN ONLY)
      */
@@ -191,8 +197,8 @@ class DoctorController extends Controller
                 ], 404);
             }
 
-            if ($doctor->photo) {
-                Storage::disk('public')->delete($doctor->photo);
+            if ($doctor->photo && file_exists(public_path($doctor->photo))) {
+                unlink(public_path($doctor->photo));
             }
 
             $doctor->delete();
@@ -208,4 +214,5 @@ class DoctorController extends Controller
             ], 500);
         }
     }
+
 }

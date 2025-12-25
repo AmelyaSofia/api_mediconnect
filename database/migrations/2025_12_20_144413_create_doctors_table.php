@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('schedule'); 
             $table->text('description')->nullable();
-            $table->string('photo')->nullable(); // path / url foto
-            $table->timestamps(); // created_at & updated_at
+            $table->string('photo')->nullable(); 
+            $table->timestamps(); 
         });
     }
 
