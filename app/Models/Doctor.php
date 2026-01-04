@@ -8,11 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Doctor extends Model
 {
     use HasFactory;
-
-    // Nama tabel (opsional, tapi aman ditulis eksplisit)
     protected $table = 'doctors';
 
-    // Field yang boleh diisi (mass assignment)
     protected $fillable = [
         'name',
         'specialization',
@@ -21,4 +18,11 @@ class Doctor extends Model
         'description',
         'photo',
     ];
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
 }
+
+

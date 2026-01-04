@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\AppointmentController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -24,4 +25,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/doctors', [DoctorController::class, 'store']);
     Route::post('/doctors/{id}', [DoctorController::class, 'update']);
     Route::delete('/doctors/{id}', [DoctorController::class, 'destroy']);
+
+    Route::post('/appointments', [AppointmentController::class, 'store']);
+    Route::get('/appointments/my', [AppointmentController::class, 'myAppointments']);
+
+    Route::get('/admin/appointments', [AppointmentController::class, 'adminIndex']);
+    Route::put('/admin/appointments/{id}', [AppointmentController::class, 'updateStatus']);
 });
